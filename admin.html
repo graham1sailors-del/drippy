@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DRIPPY - Admin Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0a0a; color: #fff; min-height: 100vh;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* Header */
+    .admin-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 2rem;
+      background: rgba(10,10,10,0.95); backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .admin-logo {
+      font-size: 1.4rem; font-weight: 900; letter-spacing: 3px;
+    }
+    .admin-logo span { color: #7c3aed; }
+    .admin-badge {
+      background: rgba(124,58,237,0.15); color: #a855f7;
+      padding: 4px 12px; border-radius: 8px; font-size: 0.75rem;
+      font-weight: 700; letter-spacing: 1px; margin-left: 10px;
+    }
+    .back-link {
+      color: #666; font-size: 0.9rem; transition: color 0.3s;
+    }
+    .back-link:hover { color: #fff; }
+    .back-link i { margin-right: 6px; }
+
+    /* Login Gate */
+    .admin-login {
+      display: flex; align-items: center; justify-content: center;
+      min-height: calc(100vh - 65px); padding: 2rem;
+    }
+    .admin-login.hidden { display: none; }
+    .login-card {
+      background: #141414; border-radius: 24px; padding: 3rem;
+      width: 100%; max-width: 400px;
+      border: 1px solid rgba(255,255,255,0.06);
+      text-align: center;
+    }
+    .login-card .lock-icon {
+      width: 64px; height: 64px; border-radius: 20px;
+      background: rgba(124,58,237,0.15); color: #7c3aed;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin: 0 auto 1.5rem;
+    }
+    .login-card h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .login-card p { color: #555; font-size: 0.9rem; margin-bottom: 2rem; }
+    .login-card input {
+      width: 100%; padding: 14px 16px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04); color: #fff;
+      font-size: 0.95rem; outline: none; margin-bottom: 1rem;
+      font-family: inherit;
+    }
+    .login-card input:focus { border-color: #7c3aed; }
+    .login-error {
+      color: #ef4444; font-size: 0.85rem; margin-bottom: 1rem; display: none;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 14px 32px; border-radius: 12px; font-weight: 600;
+      font-size: 0.95rem; border: none; cursor: pointer;
+      font-family: inherit; transition: all 0.3s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #7c3aed, #a855f7); color: #fff; width: 100%;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124,58,237,0.4); }
+
+    /* Dashboard */
+    .admin-dashboard { display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+    .admin-dashboard.active { display: block; }
+
+    .dash-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+    .dash-header h1 { font-size: 1.8rem; font-weight: 800; }
+
+    /* Stats */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem; margin-bottom: 2.5rem;
+    }
+    .stat-card {
+      background: #141414; border-radius: 16px; padding: 1.5rem;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .stat-card .stat-label { font-size: 0.8rem; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+    .stat-card .stat-value {
+      font-size: 2rem; font-weight: 800; margin-top: 0.5rem;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    /* Upload Section */
+    .upload-section {
+      background: #141414; border-radius: 20px; padding: 2rem;
+      border: 1px solid rgba(255,255,255,0.04); margin-bottom: 2rem;
+    }
+    .upload-section h2 {
+      font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;
+    }
+    .upload-section p { color: #555; font-size: 0.85rem; margin-bottom: 1.5rem; }
+
+    /* Category Tabs */
+    .category-tabs {
+      display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+    }
+    .cat-tab {
+      padding: 8px 20px; border-radius: 10px; font-size: 0.85rem;
+      font-weight: 600; background: rgba(255,255,255,0.04); color: #666;
+      border: 1px solid transparent; cursor: pointer;
+      font-family: inherit; transition: all 0.3s;
+    }
+    .cat-tab.active, .cat-tab:hover {
+      color: #7c3aed; border-color: rgba(124,58,237,0.3);
+      background: rgba(124,58,237,0.08);
+    }
+
+    /* Drop Zone */
+    .drop-zone {
+      border: 2px dashed rgba(255,255,255,0.1); border-radius: 16px;
+      padding: 3rem 2rem; text-align: center; cursor: pointer;
+      transition: all 0.3s; position: relative;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: #7c3aed; background: rgba(124,58,237,0.05);
+    }
+    .drop-zone input {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    }
+    .drop-zone .upload-icon {
+      width: 64px; height: 64px; border-radius: 20px;
+      background: rgba(124,58,237,0.1); color: #7c3aed;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin: 0 auto 1rem;
+    }
+    .drop-zone h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .drop-zone p { color: #555; font-size: 0.85rem; }
+    .drop-zone .browse { color: #7c3aed; font-weight: 600; }
+
+    /* Upload Queue */
+    .upload-queue { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+    .upload-item {
+      display: flex; align-items: center; gap: 1rem;
+      background: rgba(255,255,255,0.03); border-radius: 12px; padding: 0.75rem 1rem;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .upload-thumb {
+      width: 56px; height: 56px; border-radius: 10px;
+      object-fit: cover; background: #1a1a1a;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .upload-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .upload-info { flex: 1; }
+    .upload-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.2rem; }
+    .upload-meta { font-size: 0.75rem; color: #555; }
+    .upload-progress {
+      height: 4px; border-radius: 2px; background: rgba(255,255,255,0.06);
+      margin-top: 0.5rem; overflow: hidden;
+    }
+    .upload-progress-bar {
+      height: 100%; border-radius: 2px;
+      background: linear-gradient(90deg, #7c3aed, #a855f7);
+      transition: width 0.3s;
+    }
+    .upload-status {
+      font-size: 0.75rem; font-weight: 700; padding: 4px 10px;
+      border-radius: 6px; white-space: nowrap;
+    }
+    .status-uploading { color: #7c3aed; background: rgba(124,58,237,0.1); }
+    .status-done { color: #22c55e; background: rgba(34,197,94,0.1); }
+    .upload-remove {
+      background: none; border: none; color: #444; cursor: pointer;
+      font-size: 0.9rem; padding: 4px; transition: color 0.3s;
+    }
+    .upload-remove:hover { color: #ef4444; }
+
+    /* Gallery */
+    .gallery-section {
+      background: #141414; border-radius: 20px; padding: 2rem;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .gallery-section h2 { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.5rem; }
+    .gallery-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 1rem;
+    }
+    .gallery-item {
+      position: relative; border-radius: 12px; overflow: hidden;
+      aspect-ratio: 1; background: #1a1a1a; cursor: pointer;
+      border: 2px solid transparent; transition: all 0.3s;
+    }
+    .gallery-item:hover { border-color: rgba(124,58,237,0.4); }
+    .gallery-item img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .gallery-item .gallery-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+    .gallery-overlay button {
+      width: 36px; height: 36px; border-radius: 10px;
+      border: none; cursor: pointer; font-size: 0.85rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s;
+    }
+    .gallery-overlay .btn-view { background: rgba(255,255,255,0.15); color: #fff; }
+    .gallery-overlay .btn-delete { background: rgba(239,68,68,0.2); color: #ef4444; }
+    .gallery-overlay .btn-view:hover { background: #7c3aed; }
+    .gallery-overlay .btn-delete:hover { background: #ef4444; color: #fff; }
+    .gallery-empty {
+      text-align: center; padding: 3rem; color: #333;
+    }
+    .gallery-empty i { font-size: 2.5rem; margin-bottom: 1rem; }
+    .gallery-empty p { color: #444; }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+      display: none; align-items: center; justify-content: center;
+      z-index: 2000; padding: 2rem;
+    }
+    .lightbox.active { display: flex; }
+    .lightbox img {
+      max-width: 90%; max-height: 85vh; border-radius: 12px;
+      object-fit: contain;
+    }
+    .lightbox-close {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      background: rgba(255,255,255,0.1); color: #fff;
+      width: 44px; height: 44px; border-radius: 12px; border: none;
+      font-size: 1.2rem; cursor: pointer; transition: background 0.3s;
+    }
+    .lightbox-close:hover { background: rgba(255,255,255,0.2); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: -80px; left: 50%; transform: translateX(-50%);
+      background: #1e1e1e; color: #fff; padding: 14px 28px;
+      border-radius: 14px; font-weight: 600; font-size: 0.9rem;
+      border: 1px solid rgba(124,58,237,0.3);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      transition: bottom 0.4s ease; z-index: 3000;
+    }
+    .toast.show { bottom: 30px; }
+
+    @media (max-width: 600px) {
+      .admin-dashboard { padding: 1rem; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="admin-header">
+    <div>
+      <span class="admin-logo">DRIPPY<span>.</span></span>
+      <span class="admin-badge">ADMIN</span>
+    </div>
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Store</a>
+  </header>
+
+  <!-- Login Gate -->
+  <div class="admin-login" id="adminLogin">
+    <div class="login-card">
+      <div class="lock-icon"><i class="fas fa-lock"></i></div>
+      <h2>Admin Access</h2>
+      <p>Enter the admin password to continue</p>
+      <input type="password" id="adminPass" placeholder="Password" onkeypress="if(event.key==='Enter')adminAuth()">
+      <div class="login-error" id="loginError">Incorrect password. Try again.</div>
+      <button class="btn btn-primary" onclick="adminAuth()">Unlock</button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="admin-dashboard" id="adminDashboard">
+    <div class="dash-header">
+      <h1>Admin Dashboard</h1>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total Photos</div>
+        <div class="stat-value" id="statTotal">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">T-Shirt Photos</div>
+        <div class="stat-value" id="statTshirts">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Sweatshirt Photos</div>
+        <div class="stat-value" id="statSweatshirts">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Subscribers</div>
+        <div class="stat-value" id="statSubs">0</div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="upload-section" style="margin-bottom:2rem;">
+      <h2><i class="fas fa-cog" style="color:#7c3aed; margin-right:8px;"></i>Settings</h2>
+      <p>Notification email where subscriber alerts and orders are sent.</p>
+      <div style="display:flex;gap:0.75rem;max-width:500px;margin-top:1rem;">
+        <input type="email" id="adminEmail" placeholder="Notification email" style="flex:1;padding:14px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#fff;font-size:0.95rem;outline:none;font-family:inherit;">
+        <button class="btn btn-primary" style="padding:14px 24px;" onclick="saveAdminEmail()">Save</button>
+      </div>
+    </div>
+
+    <!-- Add Product -->
+    <div class="upload-section" style="margin-bottom:2rem;">
+      <h2><i class="fas fa-plus-circle" style="color:#7c3aed; margin-right:8px;"></i>Add New Product</h2>
+      <p>Add a new product to the storefront.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem;max-width:600px;">
+        <div style="grid-column:1/-1;">
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:#888;margin-bottom:0.4rem;">Category</label>
+          <select id="newProductCat" style="width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:#1a1a1a;color:#fff;font-size:0.95rem;font-family:inherit;outline:none;">
+            <option value="tshirts">T-Shirt</option>
+            <option value="sweatshirts">Sweatshirt</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:#888;margin-bottom:0.4rem;">Product Name</label>
+          <input type="text" id="newProductName" placeholder="e.g. Storm Hoodie" style="width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#fff;font-size:0.95rem;font-family:inherit;outline:none;">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:#888;margin-bottom:0.4rem;">Price ($)</label>
+          <input type="number" id="newProductPrice" placeholder="65" min="1" style="width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#fff;font-size:0.95rem;font-family:inherit;outline:none;">
+        </div>
+        <div style="grid-column:1/-1;">
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:#888;margin-bottom:0.4rem;">Description</label>
+          <input type="text" id="newProductDesc" placeholder="e.g. Heavyweight fleece, relaxed fit" style="width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#fff;font-size:0.95rem;font-family:inherit;outline:none;">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:#888;margin-bottom:0.4rem;">Emoji</label>
+          <input type="text" id="newProductEmoji" placeholder="e.g. 🔥" style="width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#fff;font-size:0.95rem;font-family:inherit;outline:none;">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:#888;margin-bottom:0.4rem;">Colors (comma separated)</label>
+          <input type="text" id="newProductColors" placeholder="e.g. Black, White" style="width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#fff;font-size:0.95rem;font-family:inherit;outline:none;">
+        </div>
+        <div>
+          <label style="display:block;font-size:0.8rem;font-weight:600;color:#888;margin-bottom:0.4rem;">Badge (optional)</label>
+          <select id="newProductBadge" style="width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:#1a1a1a;color:#fff;font-size:0.95rem;font-family:inherit;outline:none;">
+            <option value="">None</option>
+            <option value="NEW">NEW</option>
+            <option value="HOT">HOT</option>
+            <option value="SALE">SALE</option>
+            <option value="LIMITED">LIMITED</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="margin-top:1.25rem;" onclick="addNewProduct()"><i class="fas fa-plus"></i> Add Product</button>
+    </div>
+
+    <!-- Product Manager -->
+    <div class="upload-section" style="margin-bottom:2rem;">
+      <h2><i class="fas fa-tags" style="color:#7c3aed; margin-right:8px;"></i>Manage Products</h2>
+      <p>Edit prices, names, or delete products. Changes apply to the storefront immediately.</p>
+      <div class="category-tabs" style="margin-top:1rem;">
+        <button class="cat-tab active" onclick="showPriceTab('tshirts', this)">T-Shirts</button>
+        <button class="cat-tab" onclick="showPriceTab('sweatshirts', this)">Sweatshirts</button>
+      </div>
+      <div id="priceList" style="margin-top:1rem;display:flex;flex-direction:column;gap:0.5rem;"></div>
+      <button class="btn btn-primary" style="margin-top:1rem;" onclick="savePrices()"><i class="fas fa-save"></i> Save Changes</button>
+    </div>
+
+    <!-- Custom Orders -->
+    <div class="upload-section" style="margin-bottom:2rem;">
+      <h2><i class="fas fa-paint-brush" style="color:#7c3aed; margin-right:8px;"></i>Custom Orders <span id="customOrderCount" style="color:#555; font-size:0.9rem; font-weight:400;"></span></h2>
+      <p>Custom t-shirt and sweatshirt orders from customers.</p>
+      <div id="customOrderList" style="margin-top:1rem;"></div>
+    </div>
+
+    <!-- Upload -->
+    <div class="upload-section">
+      <h2><i class="fas fa-cloud-upload-alt" style="color:#7c3aed; margin-right:8px;"></i>Upload Photos</h2>
+      <p>Drag and drop images or click to browse. Supports JPG, PNG, WEBP up to 10MB.</p>
+
+      <div class="category-tabs">
+        <button class="cat-tab active" onclick="setCategory('tshirts', this)">T-Shirts</button>
+        <button class="cat-tab" onclick="setCategory('sweatshirts', this)">Sweatshirts</button>
+        <button class="cat-tab" onclick="setCategory('lookbook', this)">Lookbook</button>
+        <button class="cat-tab" onclick="setCategory('banners', this)">Banners</button>
+      </div>
+
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" multiple accept="image/*" onchange="handleFiles(this.files)">
+        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+        <h3>Drop images here</h3>
+        <p>or <span class="browse">browse files</span></p>
+      </div>
+
+      <div class="upload-queue" id="uploadQueue"></div>
+    </div>
+
+    <!-- Subscribers -->
+    <div class="upload-section" style="margin-bottom:2rem;">
+      <h2><i class="fas fa-bell" style="color:#7c3aed; margin-right:8px;"></i>Newsletter Subscribers <span id="subCount" style="color:#555; font-size:0.9rem; font-weight:400;"></span></h2>
+      <p>People signed up to get notified on new drops.</p>
+      <div id="subscriberList" style="margin-top:1rem;"></div>
+    </div>
+
+    <!-- Gallery -->
+    <div class="gallery-section">
+      <h2><i class="fas fa-images" style="color:#7c3aed; margin-right:8px;"></i>Uploaded Photos</h2>
+      <div class="category-tabs" style="margin-top:1rem;">
+        <button class="cat-tab active" onclick="filterGallery('all', this)">All</button>
+        <button class="cat-tab" onclick="filterGallery('tshirts', this)">T-Shirts</button>
+        <button class="cat-tab" onclick="filterGallery('sweatshirts', this)">Sweatshirts</button>
+        <button class="cat-tab" onclick="filterGallery('lookbook', this)">Lookbook</button>
+        <button class="cat-tab" onclick="filterGallery('banners', this)">Banners</button>
+      </div>
+      <div class="gallery-grid" id="galleryGrid">
+        <div class="gallery-empty">
+          <i class="fas fa-image"></i>
+          <p>No photos uploaded yet</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()"><i class="fas fa-times"></i></button>
+    <img id="lightboxImg" src="" alt="Preview">
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ===== STATE =====
+    const ADMIN_PASS = '123456./78';
+    let currentCategory = 'tshirts';
+    let galleryFilter = 'all';
+    let priceTab = 'tshirts';
+    let photos = [];
+    let adminEmail = '';
+    let priceOverrides = {};
+    let nameOverrides = {};
+    let badgeOverrides = {};
+    let _s = {
+      prices: {}, names: {}, badges: {}, sizes: {}, colors: {},
+      deleted: [], custom_products: [], custom_settings: {},
+      orders: [], purchased_custom: [], custom_orders: {}, sales: {},
+      admin_email: '', photos: []
+    };
+
+    function loadServerSettings() {
+      return fetch('/api/settings').then(r => r.json()).then(data => {
+        if (data && typeof data === 'object') {
+          Object.keys(_s).forEach(k => { if (data[k] !== undefined) _s[k] = data[k]; });
+        }
+        priceOverrides = _s.prices || {};
+        nameOverrides = _s.names || {};
+        badgeOverrides = _s.badges || {};
+        adminEmail = _s.admin_email || '';
+        photos = _s.photos || [];
+      }).catch(() => {});
+    }
+
+    function saveServerSettings() {
+      _s.prices = priceOverrides;
+      _s.names = nameOverrides;
+      _s.badges = badgeOverrides;
+      _s.admin_email = adminEmail;
+      _s.photos = photos;
+      return fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(_s)
+      }).catch(() => {});
+    }
+
+    // Load custom products from server
+    let customProducts = [];
+
+    // Product data (mirrors main site)
+    const productData = {
+      tshirts: [
+        { id: 1, name: "Midnight Drip Tee", price: 45 },
+        { id: 2, name: "Neon Pulse Tee", price: 55 },
+        { id: 3, name: "Cloud Nine Tee", price: 50 },
+        { id: 4, name: "Flame Logo Tee", price: 48 },
+        { id: 5, name: "Static Tee", price: 52 },
+        { id: 6, name: "Ghost Tee", price: 58 },
+        { id: 7, name: "Wave Rider Tee", price: 46 },
+        { id: 8, name: "Prism Tee", price: 60 },
+      ],
+      sweatshirts: [
+        { id: 101, name: "Arctic Hoodie", price: 95 },
+        { id: 102, name: "Phantom Crewneck", price: 85 },
+        { id: 103, name: "Sunset Hoodie", price: 110 },
+        { id: 104, name: "Thunder Zip-Up", price: 105 },
+        { id: 105, name: "Plush Crewneck", price: 80 },
+        { id: 106, name: "Vapor Hoodie", price: 120 },
+        { id: 107, name: "Bloom Hoodie", price: 98 },
+        { id: 108, name: "Eclipse Pullover", price: 90 },
+      ]
+    };
+
+    // Merge custom products into productData (after server load)
+    function mergeCustomProducts() {
+      customProducts = _s.custom_products || [];
+      // Reset to base products
+      productData.tshirts = productData.tshirts.filter(p => p.id <= 100);
+      productData.sweatshirts = productData.sweatshirts.filter(p => p.id <= 200 && p.id >= 100);
+      customProducts.forEach(cp => {
+        if (cp.category === 'tshirts') productData.tshirts.push(cp);
+        else productData.sweatshirts.push(cp);
+      });
+    }
+
+    // ===== ADD PRODUCT =====
+    function addNewProduct() {
+      const cat = document.getElementById('newProductCat').value;
+      const name = document.getElementById('newProductName').value.trim();
+      const price = parseInt(document.getElementById('newProductPrice').value);
+      const desc = document.getElementById('newProductDesc').value.trim();
+      const emoji = document.getElementById('newProductEmoji').value.trim() || '🏷️';
+      const colorsRaw = document.getElementById('newProductColors').value.trim();
+      const badge = document.getElementById('newProductBadge').value || null;
+
+      if (!name) return showToast('Enter a product name');
+      if (!price || price < 1) return showToast('Enter a valid price');
+      if (!desc) return showToast('Enter a description');
+
+      const colors = colorsRaw ? colorsRaw.split(',').map(c => c.trim()).filter(Boolean) : ['Black', 'White'];
+
+      const id = Date.now();
+      const newProduct = {
+        id: id,
+        name: name,
+        price: price,
+        desc: desc,
+        emoji: emoji,
+        badge: badge,
+        colors: colors,
+        category: cat
+      };
+
+      // Save to custom products on server
+      if (!Array.isArray(_s.custom_products)) _s.custom_products = [];
+      _s.custom_products.push(newProduct);
+      saveServerSettings();
+
+      // Add to local productData
+      if (cat === 'tshirts') productData.tshirts.push(newProduct);
+      else productData.sweatshirts.push(newProduct);
+
+      // Clear form
+      document.getElementById('newProductName').value = '';
+      document.getElementById('newProductPrice').value = '';
+      document.getElementById('newProductDesc').value = '';
+      document.getElementById('newProductEmoji').value = '';
+      document.getElementById('newProductColors').value = '';
+      document.getElementById('newProductBadge').value = '';
+
+      renderPriceList();
+      updateStats();
+      showToast(name + ' added to ' + (cat === 'tshirts' ? 'T-Shirts' : 'Sweatshirts') + '!');
+    }
+
+    // ===== AUTH =====
+    function adminAuth() {
+      const pass = document.getElementById('adminPass').value;
+      if (pass === ADMIN_PASS) {
+        document.getElementById('adminLogin').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.add('active');
+        loadServerSettings().then(() => {
+          mergeCustomProducts();
+          document.getElementById('adminEmail').value = adminEmail;
+          updateStats();
+          renderGallery();
+          renderSubscribers();
+          renderPriceList();
+          renderCustomOrders();
+        });
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+        document.getElementById('adminPass').value = '';
+        document.getElementById('adminPass').focus();
+      }
+    }
+
+    // ===== SETTINGS =====
+    function saveAdminEmail() {
+      const email = document.getElementById('adminEmail').value.trim();
+      if (!email) return showToast('Enter an email');
+      adminEmail = email;
+      saveServerSettings();
+      showToast('Notification email saved: ' + email);
+    }
+
+    // ===== PRICE EDITOR =====
+    function showPriceTab(tab, btn) {
+      priceTab = tab;
+      btn.closest('.category-tabs').querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderPriceList();
+    }
+
+    function renderPriceList() {
+      const list = document.getElementById('priceList');
+      const deletedIds = _s.deleted || [];
+      const items = productData[priceTab].filter(p => !deletedIds.includes(p.id));
+
+      if (items.length === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:2rem;color:#444;">No products in this category.</div>';
+        return;
+      }
+
+      const badgeOptions = ['', 'NEW', 'HOT', 'SALE', 'LIMITED', 'BEST SELLER'];
+      list.innerHTML = items.map(p => {
+        const currentPrice = priceOverrides[p.id] !== undefined ? priceOverrides[p.id] : p.price;
+        const currentName = nameOverrides[p.id] !== undefined ? nameOverrides[p.id] : p.name;
+        const currentBadge = badgeOverrides[p.id] !== undefined ? badgeOverrides[p.id] : (p.badge || '');
+        return `
+          <div style="display:flex;align-items:center;gap:0.75rem;background:rgba(255,255,255,0.03);border-radius:12px;padding:0.75rem 1rem;border:1px solid rgba(255,255,255,0.04);" id="product-row-${p.id}">
+            <input type="text" value="${currentName}" data-name-id="${p.id}"
+              style="flex:1;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#fff;font-size:0.9rem;font-weight:600;outline:none;font-family:inherit;">
+            <div style="display:flex;align-items:center;gap:4px;">
+              <span style="color:#7c3aed;font-weight:700;">$</span>
+              <input type="number" min="1" step="1" value="${currentPrice}" data-id="${p.id}"
+                style="width:80px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#fff;font-size:0.95rem;outline:none;font-family:inherit;text-align:center;">
+            </div>
+            <select data-badge-id="${p.id}"
+              style="padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:#1a1a1a;color:#fff;font-size:0.8rem;font-weight:600;outline:none;font-family:inherit;min-width:110px;">
+              ${badgeOptions.map(b => `<option value="${b}" ${b === currentBadge ? 'selected' : ''}>${b || 'No Badge'}</option>`).join('')}
+            </select>
+            <button onclick="deleteProduct(${p.id}, '${currentName.replace(/'/g, "\\'")}')" title="Delete product"
+              style="width:36px;height:36px;border-radius:10px;border:none;background:rgba(239,68,68,0.1);color:#ef4444;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.9rem;transition:all 0.3s;"
+              onmouseover="this.style.background='#ef4444';this.style.color='#fff'" onmouseout="this.style.background='rgba(239,68,68,0.1)';this.style.color='#ef4444'">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function savePrices() {
+      const priceInputs = document.querySelectorAll('#priceList input[type="number"]');
+      priceInputs.forEach(input => {
+        const id = parseInt(input.dataset.id);
+        const val = parseInt(input.value);
+        if (!isNaN(val) && val > 0) {
+          priceOverrides[id] = val;
+        }
+      });
+      const nameInputs = document.querySelectorAll('#priceList input[data-name-id]');
+      nameInputs.forEach(input => {
+        const id = parseInt(input.dataset.nameId);
+        const val = input.value.trim();
+        if (val) {
+          nameOverrides[id] = val;
+        }
+      });
+      const badgeSelects = document.querySelectorAll('#priceList select[data-badge-id]');
+      badgeSelects.forEach(select => {
+        const id = parseInt(select.dataset.badgeId);
+        badgeOverrides[id] = select.value;
+      });
+      saveServerSettings();
+      showToast('Changes saved! Live on the store now.');
+    }
+
+    function deleteProduct(id, name) {
+      if (!confirm('Delete "' + name + '"? This removes it from the storefront.')) return;
+      if (!Array.isArray(_s.deleted)) _s.deleted = [];
+      if (!_s.deleted.includes(id)) {
+        _s.deleted.push(id);
+        saveServerSettings();
+      }
+      renderPriceList();
+      showToast(name + ' deleted from store.');
+    }
+
+    // ===== CATEGORY =====
+    function setCategory(cat, btn) {
+      currentCategory = cat;
+      btn.closest('.category-tabs').querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    // ===== DRAG & DROP =====
+    const dropZone = document.getElementById('dropZone');
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      handleFiles(e.dataTransfer.files);
+    });
+
+    // ===== FILE HANDLING =====
+    function handleFiles(files) {
+      const queue = document.getElementById('uploadQueue');
+      Array.from(files).forEach(file => {
+        if (!file.type.startsWith('image/')) return;
+        if (file.size > 10 * 1024 * 1024) { showToast('File too large: ' + file.name); return; }
+
+        const id = 'upload-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+          const dataUrl = e.target.result;
+
+          // Add to queue UI
+          const item = document.createElement('div');
+          item.className = 'upload-item';
+          item.id = id;
+          item.innerHTML = `
+            <div class="upload-thumb"><img src="${dataUrl}" alt=""></div>
+            <div class="upload-info">
+              <div class="upload-name">${file.name}</div>
+              <div class="upload-meta">${formatSize(file.size)} &middot; ${currentCategory}</div>
+              <div class="upload-progress"><div class="upload-progress-bar" style="width:0%"></div></div>
+            </div>
+            <span class="upload-status status-uploading">Uploading</span>
+            <button class="upload-remove" onclick="removeUpload('${id}')"><i class="fas fa-times"></i></button>
+          `;
+          queue.appendChild(item);
+
+          // Simulate upload progress
+          simulateUpload(id, dataUrl, file.name, file.size);
+        };
+
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function simulateUpload(id, dataUrl, name, size) {
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += Math.random() * 30 + 10;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.querySelector('.upload-progress-bar').style.width = '100%';
+          el.querySelector('.upload-status').textContent = 'Done';
+          el.querySelector('.upload-status').className = 'upload-status status-done';
+
+          // Save to photos on server
+          photos.push({
+            id: id,
+            name: name,
+            size: size,
+            category: currentCategory,
+            dataUrl: dataUrl,
+            date: new Date().toISOString()
+          });
+          saveServerSettings();
+          updateStats();
+          renderGallery();
+          showToast('Uploaded: ' + name);
+        } else {
+          const el = document.getElementById(id);
+          if (el) el.querySelector('.upload-progress-bar').style.width = progress + '%';
+        }
+      }, 200);
+    }
+
+    function removeUpload(id) {
+      document.getElementById(id)?.remove();
+    }
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    // ===== GALLERY =====
+    function filterGallery(filter, btn) {
+      galleryFilter = filter;
+      if (btn) {
+        btn.closest('.category-tabs').querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      renderGallery();
+    }
+
+    function renderGallery() {
+      const grid = document.getElementById('galleryGrid');
+      const filtered = galleryFilter === 'all' ? photos : photos.filter(p => p.category === galleryFilter);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div class="gallery-empty"><i class="fas fa-image"></i><p>No photos in this category</p></div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(photo => `
+        <div class="gallery-item">
+          <img src="${photo.dataUrl}" alt="${photo.name}">
+          <div class="gallery-overlay">
+            <button class="btn-view" onclick="openLightbox('${photo.dataUrl}')" title="View"><i class="fas fa-expand"></i></button>
+            <button class="btn-delete" onclick="deletePhoto('${photo.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function deletePhoto(id) {
+      photos = photos.filter(p => p.id !== id);
+      saveServerSettings();
+      updateStats();
+      renderGallery();
+      showToast('Photo deleted');
+    }
+
+    // ===== LIGHTBOX =====
+    function openLightbox(src) {
+      document.getElementById('lightboxImg').src = src;
+      document.getElementById('lightbox').classList.add('active');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+
+    // ===== STATS =====
+    function updateStats() {
+      const subs = _s.subscribers || [];
+      document.getElementById('statTotal').textContent = photos.length;
+      document.getElementById('statTshirts').textContent = photos.filter(p => p.category === 'tshirts').length;
+      document.getElementById('statSweatshirts').textContent = photos.filter(p => p.category === 'sweatshirts').length;
+      document.getElementById('statSubs').textContent = subs.length;
+    }
+
+    // ===== CUSTOM ORDERS =====
+    function renderCustomOrders() {
+      const orders = _s.purchased_custom || [];
+      const list = document.getElementById('customOrderList');
+      document.getElementById('customOrderCount').textContent = '(' + orders.length + ')';
+
+      if (orders.length === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:2rem;color:#444;"><i class="fas fa-paint-brush" style="font-size:2rem;margin-bottom:1rem;display:block;"></i>No custom orders yet</div>';
+        return;
+      }
+
+      list.innerHTML = '<div style="display:flex;flex-direction:column;gap:0.75rem;">' + orders.map(o => `
+        <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:1rem;border:1px solid rgba(255,255,255,0.04);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <span style="font-size:1.5rem;">${o.type === 'T-Shirt' ? '👕' : '🧥'}</span>
+              <div>
+                <div style="font-weight:700;font-size:0.95rem;">Custom ${o.type}</div>
+                <div style="font-size:0.8rem;color:#555;">${o.buyer} (${o.buyerEmail})</div>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-weight:800;color:#7c3aed;">$${o.price} x${o.qty}</div>
+              <div style="font-size:0.75rem;color:#444;">${new Date(o.date).toLocaleDateString()}</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.85rem;">
+            <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:0.5rem 0.75rem;">
+              <span style="color:#555;">Text:</span> <strong>"${o.text}"</strong>
+            </div>
+            <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:0.5rem 0.75rem;">
+              <span style="color:#555;">Font:</span> <strong>${o.font}</strong>
+            </div>
+            <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:0.5rem 0.75rem;">
+              <span style="color:#555;">Text Size:</span> <strong>${o.size}px</strong>
+            </div>
+            <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:0.5rem 0.75rem;">
+              <span style="color:#555;">Text Color:</span> <span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:${o.color};vertical-align:middle;border:1px solid rgba(255,255,255,0.2);"></span> <strong>${o.color}</strong>
+            </div>
+            <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:0.5rem 0.75rem;">
+              <span style="color:#555;">Graphic:</span> <strong>${o.graphicSymbol ? o.graphicSymbol + ' ' + o.graphic : 'None'}</strong>
+            </div>
+            <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:0.5rem 0.75rem;grid-column:1/-1;">
+              <span style="color:#555;">Shirt Color:</span> <span style="display:inline-block;width:14px;height:14px;border-radius:4px;background:${o.shirtColor};vertical-align:middle;border:1px solid rgba(255,255,255,0.2);"></span> <strong>${o.shirtColor}</strong>
+            </div>
+          </div>
+        </div>
+      `).join('') + '</div>';
+    }
+
+    // ===== SUBSCRIBERS =====
+    function renderSubscribers() {
+      const subs = _s.subscribers || [];
+      const list = document.getElementById('subscriberList');
+      document.getElementById('subCount').textContent = '(' + subs.length + ')';
+
+      if (subs.length === 0) {
+        list.innerHTML = '<div class="gallery-empty"><i class="fas fa-bell-slash"></i><p>No subscribers yet</p></div>';
+        return;
+      }
+
+      list.innerHTML = '<div style="display:flex;flex-direction:column;gap:0.5rem;">' + subs.map(sub => `
+        <div style="display:flex;align-items:center;gap:1rem;background:rgba(255,255,255,0.03);border-radius:12px;padding:0.75rem 1rem;border:1px solid rgba(255,255,255,0.04);">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(124,58,237,0.12);color:#7c3aed;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-user"></i></div>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:0.9rem;">${sub.name || 'Unknown'}</div>
+            <div style="font-size:0.8rem;color:#555;">${sub.email}${sub.phone ? ' &middot; ' + sub.phone : ''}</div>
+          </div>
+          <div style="font-size:0.75rem;color:#444;">${new Date(sub.date).toLocaleDateString()}</div>
+        </div>
+      `).join('') + '</div>';
+    }
+
+    // ===== TOAST =====
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>

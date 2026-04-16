@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DRIPPY - Premium Streetwear</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo" onclick="showPage('home')">DRIPPY<span class="logo-dot">.</span></a>
+      <ul class="nav-links">
+        <li><a href="#" onclick="showPage('home')">Home</a></li>
+        <li class="dropdown">
+          <a href="#" onclick="showPage('tshirts')">T-Shirts <i class="fas fa-chevron-down"></i></a>
+        </li>
+        <li class="dropdown">
+          <a href="#" onclick="showPage('sweatshirts')">Sweatshirts <i class="fas fa-chevron-down"></i></a>
+        </li>
+      </ul>
+      <div class="nav-actions">
+        <button class="nav-btn cart-btn" onclick="showPage('checkout')" title="Cart">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-count" id="cartCount">0</span>
+        </button>
+        <div class="account-wrapper" id="accountWrapper">
+          <button class="nav-btn" onclick="toggleAccountMenu()" title="Account"><i class="fas fa-user" id="accountIcon"></i></button>
+          <div class="account-dropdown" id="accountDropdown">
+            <div class="account-info" id="accountInfo"></div>
+            <button onclick="logout()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+          </div>
+        </div>
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+      </div>
+    </div>
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#" onclick="showPage('home'); toggleMobileMenu()">Home</a>
+      <a href="#" onclick="showPage('tshirts'); toggleMobileMenu()">T-Shirts</a>
+      <a href="#" onclick="showPage('sweatshirts'); toggleMobileMenu()">Sweatshirts</a>
+      <div class="mobile-divider"></div>
+      <a href="#" onclick="showPage('checkout'); toggleMobileMenu()"><i class="fas fa-shopping-bag"></i> Cart</a>
+      <a href="#" onclick="if(currentUser){logout();toggleMobileMenu();}else{showPage('login');toggleMobileMenu();}" id="mobileAccountLink"><i class="fas fa-user"></i> Account</a>
+    </div>
+  </nav>
+
+  <!-- HOME PAGE -->
+  <section class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-content">
+        <h1 class="hero-title">DROP THE <span class="highlight">DRIP</span></h1>
+        <p class="hero-subtitle">Premium streetwear for those who set trends, not follow them.</p>
+        <div class="hero-buttons">
+          <button class="btn btn-primary" onclick="showPage('tshirts')">Shop T-Shirts</button>
+          <button class="btn btn-outline" onclick="showPage('sweatshirts')">Shop Sweatshirts</button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-shape"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- T-SHIRTS PAGE -->
+  <section class="page" id="page-tshirts">
+    <div class="page-header">
+      <span class="category-tag">COLLECTION</span>
+      <h1>T-Shirts</h1>
+    </div>
+    <div class="section">
+      <div class="product-grid" id="tshirtGrid"></div>
+    </div>
+    <!-- Custom T-Shirt Designer -->
+    <div class="customizer-banner">
+      <h2>Design Your Own T-Shirt</h2>
+      <p>Add your own text with custom fonts, colors, and sizes</p>
+      <button class="btn btn-primary" onclick="showPage('custom-tee')"><i class="fas fa-paint-brush"></i> Start Designing</button>
+    </div>
+  </section>
+
+  <!-- SWEATSHIRTS PAGE -->
+  <section class="page" id="page-sweatshirts">
+    <div class="page-header">
+      <span class="category-tag">COLLECTION</span>
+      <h1>Sweatshirts</h1>
+    </div>
+    <div class="section">
+      <div class="product-grid" id="sweatshirtGrid"></div>
+    </div>
+    <!-- Custom Sweatshirt Designer -->
+    <div class="customizer-banner">
+      <h2>Design Your Own Sweatshirt</h2>
+      <p>Add your own text with custom fonts, colors, and sizes</p>
+      <button class="btn btn-primary" onclick="showPage('custom-sweat')"><i class="fas fa-paint-brush"></i> Start Designing</button>
+    </div>
+  </section>
+
+  <!-- CUSTOM TEE DESIGNER -->
+  <section class="page" id="page-custom-tee">
+    <div class="page-header">
+      <span class="category-tag">CUSTOMIZE</span>
+      <h1>Design Your T-Shirt</h1>
+    </div>
+    <div class="section">
+      <div class="designer-layout">
+        <div class="designer-preview">
+          <div class="preview-shirt tee-shape" id="teePreview">
+            <div class="shirt-outline">
+              <svg viewBox="0 0 400 450" xmlns="http://www.w3.org/2000/svg">
+                <path id="teeSvgFill" d="M100,0 L160,0 C165,30 185,50 200,50 C215,50 235,30 240,0 L300,0 L400,80 L350,130 L300,95 L300,440 C300,445 295,450 290,450 L110,450 C105,450 100,445 100,440 L100,95 L50,130 L0,80 Z" fill="#f0f0f0" stroke="#e0e0e0" stroke-width="2"/>
+                <!-- Collar -->
+                <path d="M160,0 C165,30 185,50 200,50 C215,50 235,30 240,0" fill="none" stroke="#d5d5d5" stroke-width="3"/>
+                <!-- Sleeve seams -->
+                <line x1="100" y1="95" x2="100" y2="0" stroke="#e8e8e8" stroke-width="1" opacity="0.5"/>
+                <line x1="300" y1="95" x2="300" y2="0" stroke="#e8e8e8" stroke-width="1" opacity="0.5"/>
+                <!-- Bottom hem -->
+                <line x1="100" y1="445" x2="300" y2="445" stroke="#e0e0e0" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="preview-graphic" id="teePreviewGraphic"></div>
+            <div class="preview-text" id="teePreviewText">DRIPPY</div>
+          </div>
+        </div>
+        <div class="designer-controls">
+          <div class="control-group">
+            <label>Your Text</label>
+            <input type="text" id="teeText" placeholder="Enter your text" maxlength="30" oninput="updatePreview('tee')">
+          </div>
+          <div class="control-group">
+            <label>Font</label>
+            <div class="font-grid" id="teeFonts"></div>
+          </div>
+          <div class="control-group">
+            <label>Graphics</label>
+            <div class="graphic-grid" id="teeGraphics"></div>
+          </div>
+          <div class="control-group">
+            <label>Text Color</label>
+            <div class="color-grid" id="teeColors"></div>
+          </div>
+          <div class="control-group">
+            <label>Text Size</label>
+            <select id="teeSize" onchange="updatePreview('tee')">
+              <option value="18">Small</option>
+              <option value="24">Medium</option>
+              <option value="28" selected>Large</option>
+              <option value="36">X-Large</option>
+              <option value="44">XX-Large</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>Shirt Color</label>
+            <div class="shirt-color-grid" id="teeShirtColors"></div>
+          </div>
+          <div class="control-group">
+            <label>Size</label>
+            <select id="teeClothingSize"></select>
+          </div>
+          <div class="designer-price">
+            <span>Custom T-Shirt</span>
+            <span class="designer-price-value" id="teeCustomPriceValue">$55</span>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="addCustomToCart('tee')"><i class="fas fa-shopping-bag"></i> Add to Bag</button>
+          <button class="btn btn-outline btn-full" onclick="showPage('tshirts')" style="margin-top:0.5rem;"><i class="fas fa-arrow-left"></i> Back to T-Shirts</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CUSTOM SWEATSHIRT DESIGNER -->
+  <section class="page" id="page-custom-sweat">
+    <div class="page-header">
+      <span class="category-tag">CUSTOMIZE</span>
+      <h1>Design Your Sweatshirt</h1>
+    </div>
+    <div class="section">
+      <div class="designer-layout">
+        <div class="designer-preview">
+          <div class="preview-shirt sweat-shape" id="sweatPreview">
+            <div class="shirt-outline">
+              <svg viewBox="0 0 400 460" xmlns="http://www.w3.org/2000/svg">
+                <path id="sweatSvgFill" d="M95,0 L155,0 C160,25 180,45 200,45 C220,45 240,25 245,0 L305,0 L400,75 L355,130 L305,100 L305,450 C305,455 300,460 295,460 L105,460 C100,460 95,455 95,450 L95,100 L45,130 L0,75 Z" fill="#f0f0f0" stroke="#e0e0e0" stroke-width="2"/>
+                <!-- Hood -->
+                <path d="M155,0 C150,-5 130,0 125,15 C118,35 140,45 160,42 C170,40 180,45 200,45 C220,45 230,40 240,42 C260,45 282,35 275,15 C270,0 250,-5 245,0" fill="none" stroke="#d5d5d5" stroke-width="2.5"/>
+                <!-- Hood inner -->
+                <path d="M155,0 C158,20 178,38 200,38 C222,38 242,20 245,0" fill="none" stroke="#e0e0e0" stroke-width="1.5"/>
+                <!-- Kangaroo pocket -->
+                <rect x="140" y="300" width="120" height="60" rx="12" fill="none" stroke="#e0e0e0" stroke-width="1.5"/>
+                <!-- Sleeve cuffs -->
+                <rect x="85" y="90" width="20" height="12" rx="3" fill="none" stroke="#e0e0e0" stroke-width="1.5"/>
+                <rect x="295" y="90" width="20" height="12" rx="3" fill="none" stroke="#e0e0e0" stroke-width="1.5"/>
+                <!-- Bottom hem -->
+                <line x1="95" y1="455" x2="305" y2="455" stroke="#e0e0e0" stroke-width="2.5"/>
+                <!-- Waistband -->
+                <rect x="95" y="440" width="210" height="15" rx="2" fill="none" stroke="#e8e8e8" stroke-width="1"/>
+              </svg>
+            </div>
+            <div class="preview-graphic" id="sweatPreviewGraphic"></div>
+            <div class="preview-text" id="sweatPreviewText">DRIPPY</div>
+          </div>
+        </div>
+        <div class="designer-controls">
+          <div class="control-group">
+            <label>Your Text</label>
+            <input type="text" id="sweatText" placeholder="Enter your text" maxlength="30" oninput="updatePreview('sweat')">
+          </div>
+          <div class="control-group">
+            <label>Font</label>
+            <div class="font-grid" id="sweatFonts"></div>
+          </div>
+          <div class="control-group">
+            <label>Graphics</label>
+            <div class="graphic-grid" id="sweatGraphics"></div>
+          </div>
+          <div class="control-group">
+            <label>Text Color</label>
+            <div class="color-grid" id="sweatColors"></div>
+          </div>
+          <div class="control-group">
+            <label>Text Size</label>
+            <select id="sweatSize" onchange="updatePreview('sweat')">
+              <option value="18">Small</option>
+              <option value="24">Medium</option>
+              <option value="28" selected>Large</option>
+              <option value="36">X-Large</option>
+              <option value="44">XX-Large</option>
+            </select>
+          </div>
+          <div class="control-group">
+            <label>Shirt Color</label>
+            <div class="shirt-color-grid" id="sweatShirtColors"></div>
+          </div>
+          <div class="control-group">
+            <label>Size</label>
+            <select id="sweatClothingSize"></select>
+          </div>
+          <div class="designer-price">
+            <span>Custom Sweatshirt</span>
+            <span class="designer-price-value" id="sweatCustomPriceValue">$85</span>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="addCustomToCart('sweat')"><i class="fas fa-shopping-bag"></i> Add to Bag</button>
+          <button class="btn btn-outline btn-full" onclick="showPage('sweatshirts')" style="margin-top:0.5rem;"><i class="fas fa-arrow-left"></i> Back to Sweatshirts</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCT DETAIL PAGE -->
+  <section class="page" id="page-product">
+    <div class="section">
+      <button class="btn-back" onclick="history.back(); showPage(window._lastPage || 'home')"><i class="fas fa-arrow-left"></i> Back</button>
+      <div class="product-detail" id="productDetail"></div>
+    </div>
+  </section>
+
+  <!-- CHECKOUT PAGE -->
+  <section class="page" id="page-checkout">
+    <div class="page-header">
+      <h1>YOUR BAG</h1>
+      <p>Review your items</p>
+    </div>
+    <div class="checkout-container">
+      <div class="cart-items" id="cartItems">
+        <div class="empty-cart" id="emptyCart">
+          <i class="fas fa-shopping-bag"></i>
+          <h3>Your bag is empty</h3>
+          <p>Add some drip to get started</p>
+          <button class="btn btn-primary" onclick="showPage('tshirts')">Start Shopping</button>
+        </div>
+      </div>
+      <div class="order-summary" id="orderSummary" style="display:none;">
+        <h3>Order Summary</h3>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span id="subtotal">$0.00</span>
+        </div>
+        <div class="summary-row">
+          <span>Shipping</span>
+          <span id="shipping">FREE</span>
+        </div>
+        <div class="summary-row">
+          <span>Tax</span>
+          <span id="tax">$0.00</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span id="total">$0.00</span>
+        </div>
+
+        <!-- Payment: QR code for desktop, button for mobile -->
+        <div class="venmo-desktop">
+          <div class="venmo-qr-wrapper">
+            <p style="font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;text-align:center;"><i class="fas fa-qrcode" style="color:#22c55e;margin-right:4px;"></i> Scan to Pay</p>
+            <canvas id="venmoQR" style="width:180px;height:180px;margin:0 auto;display:block;border-radius:12px;"></canvas>
+            <p class="pay-amount-label" id="qrPayAmount" style="font-size:1.1rem;font-weight:800;color:#1a1a1a;margin-top:0.75rem;text-align:center;"></p>
+            <p style="font-size:0.75rem;color:#999;margin-top:0.25rem;text-align:center;">Scan with your phone and send the exact amount above</p>
+          </div>
+        </div>
+        <a href="https://gl.me/u/bqGDz26h4Lcv" target="_blank" class="btn btn-full venmo-btn venmo-mobile" onclick="processCheckout()" id="mobilePayBtn">
+          <i class="fas fa-credit-card" style="margin-right:6px;"></i> Pay
+        </a>
+        <div class="payment-icons">
+          <i class="fab fa-cc-visa"></i>
+          <i class="fab fa-cc-mastercard"></i>
+          <i class="fab fa-cc-amex"></i>
+          <i class="fab fa-cc-paypal"></i>
+        </div>
+        <div class="address-input" style="margin-top:1rem;">
+          <h4 style="font-size:0.9rem;font-weight:700;margin-bottom:0.5rem;"><i class="fas fa-map-marker-alt" style="color:#7c3aed;margin-right:4px;"></i> Shipping Address</h4>
+          <input type="text" id="shipName" placeholder="Full Name" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;margin-bottom:0.5rem;font-family:inherit;font-size:0.85rem;">
+          <input type="text" id="shipAddress" placeholder="Street Address" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;margin-bottom:0.5rem;font-family:inherit;font-size:0.85rem;">
+          <div style="display:flex;gap:0.5rem;">
+            <input type="text" id="shipCity" placeholder="City" style="flex:1;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-family:inherit;font-size:0.85rem;">
+            <input type="text" id="shipState" placeholder="State" style="width:80px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-family:inherit;font-size:0.85rem;">
+            <input type="text" id="shipZip" placeholder="ZIP" style="width:80px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-family:inherit;font-size:0.85rem;">
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="processCheckout()" style="margin-top:1rem;">
+          <i class="fas fa-lock"></i> Checkout
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOGIN / SIGNUP PAGE -->
+  <section class="page" id="page-login">
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab active" onclick="switchAuth('login')">Login</button>
+          <button class="auth-tab" onclick="switchAuth('signup')">Sign Up</button>
+        </div>
+
+        <!-- Login Form -->
+        <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
+          <h2>Welcome Back</h2>
+          <p class="auth-subtitle">Sign in to your DRIPPY account</p>
+          <div class="form-group">
+            <label>Email / Username</label>
+            <input type="text" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" placeholder="Enter your password" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Login</button>
+          <p class="auth-link">Forgot your password? <a href="#">Reset it</a></p>
+        </form>
+
+        <!-- Signup Form -->
+        <form class="auth-form" id="signupForm" onsubmit="handleSignup(event)">
+          <h2>Join DRIPPY</h2>
+          <p class="auth-subtitle">Create your account and start shopping</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" placeholder="First" required>
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" placeholder="Last" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email / Username</label>
+            <input type="text" placeholder="you@example.com" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" placeholder="Create a password" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+          <p class="auth-link">Already have an account? <a href="#" onclick="switchAuth('login')">Login</a></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADMIN PAGE (hidden for non-admin users) -->
+  <section class="page" id="page-admin">
+    <div class="admin-panel">
+      <div class="admin-panel-header">
+        <div>
+          <span class="admin-panel-logo">DRIPPY<span>.</span></span>
+          <span class="admin-panel-badge">ADMIN</span>
+        </div>
+        <button class="btn btn-outline" onclick="showPage('home')" style="padding:10px 20px;font-size:0.85rem;"><i class="fas fa-arrow-left"></i> Back to Store</button>
+      </div>
+
+      <!-- Admin Login Gate -->
+      <div id="adminLoginGate">
+        <div class="admin-login-card">
+          <div class="admin-lock-icon"><i class="fas fa-lock"></i></div>
+          <h2>Admin Access</h2>
+          <p>Enter the admin password to continue</p>
+          <input type="password" id="adminPass" placeholder="Password" onkeypress="if(event.key==='Enter')adminAuth()">
+          <div class="admin-login-error" id="adminLoginError">Incorrect password. Try again.</div>
+          <button class="btn btn-primary" onclick="adminAuth()" style="width:100%;">Unlock</button>
+        </div>
+      </div>
+
+      <!-- Admin Dashboard (shown after auth) -->
+      <div id="adminDashboard" style="display:none;">
+        <div class="dash-header"><h1>Admin Dashboard</h1></div>
+
+
+        <!-- Stats -->
+        <div class="admin-stats-row">
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">Total Photos</div>
+            <div class="admin-stat-value" id="statTotal">0</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">T-Shirt Photos</div>
+            <div class="admin-stat-value" id="statTshirts">0</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">Sweatshirt Photos</div>
+            <div class="admin-stat-value" id="statSweatshirts">0</div>
+          </div>
+          <div class="admin-stat-card">
+            <div class="admin-stat-label">Subscribers</div>
+            <div class="admin-stat-value" id="statSubs">0</div>
+          </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="admin-section">
+          <h2><i class="fas fa-cog" style="color:#7c3aed; margin-right:8px;"></i>Settings</h2>
+          <p>Notification email where subscriber alerts and orders are sent.</p>
+          <div style="display:flex;gap:0.75rem;max-width:500px;margin-top:1rem;">
+            <input type="email" id="adminEmail" placeholder="Notification email" class="admin-input" style="flex:1;">
+            <button class="btn btn-primary" style="padding:14px 24px;width:auto;" onclick="saveAdminEmail()">Save</button>
+          </div>
+        </div>
+
+        <!-- Add Product -->
+        <div class="admin-section">
+          <h2><i class="fas fa-plus-circle" style="color:#7c3aed; margin-right:8px;"></i>Add New Product</h2>
+          <p>Add a new product to the storefront.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem;max-width:600px;">
+            <div style="grid-column:1/-1;">
+              <label class="admin-label">Category</label>
+              <select id="newProductCat" class="admin-select">
+                <option value="tshirts">T-Shirt</option>
+                <option value="sweatshirts">Sweatshirt</option>
+              </select>
+            </div>
+            <div>
+              <label class="admin-label">Product Name</label>
+              <input type="text" id="newProductName" placeholder="e.g. Storm Hoodie" class="admin-input">
+            </div>
+            <div>
+              <label class="admin-label">Price ($)</label>
+              <input type="number" id="newProductPrice" placeholder="65" min="1" class="admin-input">
+            </div>
+            <div style="grid-column:1/-1;">
+              <label class="admin-label">Description</label>
+              <input type="text" id="newProductDesc" placeholder="e.g. Heavyweight fleece, relaxed fit" class="admin-input">
+            </div>
+            <div>
+              <label class="admin-label">Emoji</label>
+              <input type="text" id="newProductEmoji" placeholder="e.g. 🔥" class="admin-input">
+            </div>
+            <div>
+              <label class="admin-label">Colors (comma separated)</label>
+              <input type="text" id="newProductColors" placeholder="e.g. Black, White" class="admin-input">
+            </div>
+            <div>
+              <label class="admin-label">Badge (optional)</label>
+              <select id="newProductBadge" class="admin-select">
+                <option value="">None</option>
+                <option value="NEW">NEW</option>
+                <option value="HOT">HOT</option>
+                <option value="SALE">SALE</option>
+                <option value="LIMITED">LIMITED</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" style="margin-top:1.25rem;width:auto;padding:14px 32px;" onclick="addNewProduct()"><i class="fas fa-plus"></i> Add Product</button>
+        </div>
+
+        <!-- Product Manager -->
+        <div class="admin-section">
+          <h2><i class="fas fa-tags" style="color:#7c3aed; margin-right:8px;"></i>Manage Products</h2>
+          <p>Edit prices, names, badges, or delete products. Changes apply immediately.</p>
+          <div class="admin-tabs" style="margin-top:1rem;">
+            <button class="admin-tab active" onclick="showPriceTab('tshirts', this)">T-Shirts</button>
+            <button class="admin-tab" onclick="showPriceTab('sweatshirts', this)">Sweatshirts</button>
+          </div>
+          <div id="priceList" style="margin-top:1rem;display:flex;flex-direction:column;gap:0.5rem;"></div>
+          <button class="btn btn-primary" style="margin-top:1rem;width:auto;padding:14px 32px;" onclick="savePrices()"><i class="fas fa-save"></i> Save Changes</button>
+        </div>
+
+        <!-- All Orders -->
+        <div class="admin-section">
+          <h2><i class="fas fa-shopping-bag" style="color:#7c3aed; margin-right:8px;"></i>Orders <span id="orderCount" style="color:#555; font-size:0.9rem; font-weight:400;"></span></h2>
+          <p>All orders placed by customers.</p>
+          <div id="orderList" style="margin-top:1rem;"></div>
+        </div>
+
+        <!-- Custom Designer Templates -->
+        <div class="admin-section">
+          <h2><i class="fas fa-image" style="color:#7c3aed; margin-right:8px;"></i>Custom Designer Templates</h2>
+          <p>Upload the base t-shirt and sweatshirt images that customers type on in the designer. These replace the default outlines.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1.25rem;">
+            <!-- T-Shirt Template -->
+            <div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:1.25rem;border:1px solid rgba(255,255,255,0.06);text-align:center;">
+              <div style="font-weight:700;font-size:0.95rem;margin-bottom:0.75rem;">T-Shirt Template</div>
+              <div id="teeTemplatePreview" style="width:100%;aspect-ratio:4/4.5;border-radius:12px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:0.75rem;cursor:pointer;border:2px dashed rgba(255,255,255,0.1);" onclick="document.getElementById('teeTemplateInput').click()">
+                <div id="teeTemplatePlaceholder" style="color:#444;font-size:0.85rem;"><i class="fas fa-tshirt" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Click to upload</div>
+              </div>
+              <input type="file" id="teeTemplateInput" accept="image/*" style="display:none;" onchange="uploadCustomTemplate('tshirt', this)">
+              <div style="display:flex;gap:0.5rem;">
+                <button class="btn btn-primary" style="flex:1;padding:10px;font-size:0.85rem;width:auto;" onclick="document.getElementById('teeTemplateInput').click()"><i class="fas fa-upload"></i> Upload</button>
+                <button class="btn btn-outline" style="flex:1;padding:10px;font-size:0.85rem;width:auto;color:#ef4444;border-color:rgba(239,68,68,0.3);" onclick="removeCustomTemplate('tshirt')" id="teeTemplateRemoveBtn" disabled><i class="fas fa-trash"></i> Remove</button>
+              </div>
+            </div>
+            <!-- Sweatshirt Template -->
+            <div style="background:rgba(255,255,255,0.03);border-radius:16px;padding:1.25rem;border:1px solid rgba(255,255,255,0.06);text-align:center;">
+              <div style="font-weight:700;font-size:0.95rem;margin-bottom:0.75rem;">Sweatshirt Template</div>
+              <div id="sweatTemplatePreview" style="width:100%;aspect-ratio:4/4.6;border-radius:12px;background:#1a1a1a;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:0.75rem;cursor:pointer;border:2px dashed rgba(255,255,255,0.1);" onclick="document.getElementById('sweatTemplateInput').click()">
+                <div id="sweatTemplatePlaceholder" style="color:#444;font-size:0.85rem;"><i class="fas fa-mitten" style="font-size:2rem;display:block;margin-bottom:0.5rem;"></i>Click to upload</div>
+              </div>
+              <input type="file" id="sweatTemplateInput" accept="image/*" style="display:none;" onchange="uploadCustomTemplate('sweatshirt', this)">
+              <div style="display:flex;gap:0.5rem;">
+                <button class="btn btn-primary" style="flex:1;padding:10px;font-size:0.85rem;width:auto;" onclick="document.getElementById('sweatTemplateInput').click()"><i class="fas fa-upload"></i> Upload</button>
+                <button class="btn btn-outline" style="flex:1;padding:10px;font-size:0.85rem;width:auto;color:#ef4444;border-color:rgba(239,68,68,0.3);" onclick="removeCustomTemplate('sweatshirt')" id="sweatTemplateRemoveBtn" disabled><i class="fas fa-trash"></i> Remove</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Product Settings -->
+        <div class="admin-section">
+          <h2><i class="fas fa-palette" style="color:#7c3aed; margin-right:8px;"></i>Custom Product Settings</h2>
+          <p>Set pricing and available sizes for custom t-shirts and sweatshirts.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:1rem;">
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.25rem;">
+              <div style="font-weight:700;font-size:1rem;margin-bottom:1rem;">Custom T-Shirt</div>
+              <label class="admin-label">Price ($)</label>
+              <input type="number" id="customTeePrice" min="1" step="1" class="admin-input" style="width:100%;margin-bottom:1rem;">
+              <label class="admin-label">Available Sizes</label>
+              <input type="text" id="customTeeSizes" class="admin-input" style="width:100%;" placeholder="Youth S, Youth M, Youth L">
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:1.25rem;">
+              <div style="font-weight:700;font-size:1rem;margin-bottom:1rem;">Custom Sweatshirt</div>
+              <label class="admin-label">Price ($)</label>
+              <input type="number" id="customSweatPrice" min="1" step="1" class="admin-input" style="width:100%;margin-bottom:1rem;">
+              <label class="admin-label">Available Sizes</label>
+              <input type="text" id="customSweatSizes" class="admin-input" style="width:100%;" placeholder="S, M, L, XL, XXL">
+            </div>
+          </div>
+          <button class="btn btn-primary" style="margin-top:1rem;" onclick="saveCustomSettings()"><i class="fas fa-save"></i> Save Custom Settings</button>
+        </div>
+
+        <!-- Custom Orders -->
+        <div class="admin-section">
+          <h2><i class="fas fa-paint-brush" style="color:#7c3aed; margin-right:8px;"></i>Custom Orders <span id="customOrderCount" style="color:#555; font-size:0.9rem; font-weight:400;"></span></h2>
+          <p>Custom t-shirt and sweatshirt orders from customers.</p>
+          <div id="customOrderList" style="margin-top:1rem;"></div>
+        </div>
+
+        <!-- T-Shirt Photos -->
+        <div class="admin-section">
+          <h2><i class="fas fa-tshirt" style="color:#7c3aed; margin-right:8px;"></i>T-Shirt Photos</h2>
+          <p>Click any box to upload a photo for that product. Photos appear on the storefront instantly.</p>
+          <div class="admin-photo-grid" id="tshirtPhotoGrid"></div>
+        </div>
+
+        <!-- Sweatshirt Photos -->
+        <div class="admin-section">
+          <h2><i class="fas fa-mitten" style="color:#7c3aed; margin-right:8px;"></i>Sweatshirt Photos</h2>
+          <p>Click any box to upload a photo for that product.</p>
+          <div class="admin-photo-grid" id="sweatshirtPhotoGrid"></div>
+        </div>
+
+        <!-- Subscribers -->
+        <div class="admin-section">
+          <h2><i class="fas fa-bell" style="color:#7c3aed; margin-right:8px;"></i>Newsletter Subscribers <span id="subCount" style="color:#555; font-size:0.9rem; font-weight:400;"></span></h2>
+          <p>People signed up to get notified on new drops.</p>
+          <div id="subscriberList" style="margin-top:1rem;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div class="admin-lightbox" id="adminLightbox" onclick="closeAdminLightbox()">
+      <button class="admin-lightbox-close" onclick="closeAdminLightbox()"><i class="fas fa-times"></i></button>
+      <img id="adminLightboxImg" src="" alt="Preview">
+    </div>
+  </section>
+
+  <!-- AI CHAT ASSISTANT -->
+  <div class="chat-widget" id="chatWidget">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar"><i class="fas fa-robot"></i></div>
+        <div>
+          <h4>Drippy AI</h4>
+          <span class="chat-status">Online</span>
+        </div>
+      </div>
+      <div class="chat-header-actions">
+        <button onclick="toggleEmailMode()" title="Send via email" class="chat-action-btn" id="emailToggle">
+          <i class="fas fa-envelope"></i>
+        </button>
+        <button onclick="toggleChat()" class="chat-action-btn"><i class="fas fa-times"></i></button>
+      </div>
+    </div>
+
+    <!-- Email compose bar -->
+    <div class="email-bar" id="emailBar" style="display:none;">
+      <div style="display:flex;flex-direction:column;gap:0.5rem;padding:0.75rem;width:100%;">
+        <input type="text" placeholder="Subject" id="chatEmailSubject" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:0.85rem;font-family:inherit;outline:none;">
+        <textarea placeholder="Write your message..." id="chatEmailBody" rows="3" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:0.85rem;font-family:inherit;outline:none;resize:none;"></textarea>
+        <input type="text" placeholder="Your name (From)" id="chatEmailFrom" style="padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;font-size:0.85rem;font-family:inherit;outline:none;">
+        <button onclick="sendEmailFromChat()" style="padding:8px 16px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;font-weight:600;font-size:0.85rem;cursor:pointer;font-family:inherit;"><i class="fas fa-paper-plane"></i> Send Email</button>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-message bot">
+        <div class="message-bubble">
+          Hey! I'm Drippy AI, your personal style assistant. I can help you find the perfect fit, answer questions about sizing, track orders, or just chat about fashion. What's up?
+        </div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chatInput" placeholder="Ask me anything..." onkeypress="if(event.key==='Enter')sendMessage()">
+      <button onclick="sendMessage()" class="chat-send"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- Chat Toggle Button -->
+  <button class="chat-fab" id="chatFab" onclick="toggleChat()">
+    <i class="fas fa-comment-dots"></i>
+  </button>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <h3>DRIPPY<span class="logo-dot">.</span></h3>
+        <p>Premium streetwear for the bold.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Shop</h4>
+        <a href="#" onclick="showPage('tshirts')">T-Shirts</a>
+        <a href="#" onclick="showPage('sweatshirts')">Sweatshirts</a>
+      </div>
+      <div class="footer-links">
+        <h4>Help</h4>
+        <a href="#">Sizing Guide</a>
+        <a href="#">Shipping</a>
+        <a href="#">Returns</a>
+      </div>
+      <div class="footer-links">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="#">Careers</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 DRIPPY. All rights reserved.</p>
+      <a href="#" class="admin-link" id="adminLink" style="display:none;" onclick="showPage('admin')"><i class="fas fa-lock"></i> Admin</a>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

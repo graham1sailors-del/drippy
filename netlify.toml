@@ -2,5 +2,6 @@
   publish = "."
   command = ""
 
-[build.processing]
-  skip_processing = false
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

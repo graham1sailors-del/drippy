@@ -453,7 +453,10 @@
 
   <script>
     // ===== STATE =====
-    const ADMIN_PASS = '123456./78';
+    // Admin password is verified server-side against ADMIN_PASSWORD env var.
+    // The password is held only in sessionStorage during the admin session
+    // and sent as a Bearer token on each admin request.
+    let adminToken = sessionStorage.getItem('drippy_admin_token') || '';
     let currentCategory = 'tshirts';
     let galleryFilter = 'all';
     let priceTab = 'tshirts';
@@ -469,8 +472,17 @@
       admin_email: '', photos: []
     };
 
+    function authHeaders() {
+      return adminToken
+        ? { 'Authorization': 'Bearer ' + adminToken, 'Content-Type': 'application/json' }
+        : { 'Content-Type': 'application/json' };
+    }
+
     function loadServerSettings() {
-      return fetch('/api/settings').then(r => r.json()).then(data => {
+      return fetch('/api/settings', { headers: authHeaders() }).then(r => {
+        if (r.status === 401) { adminLogout('Session expired. Log in again.'); return null; }
+        return r.json();
+      }).then(data => {
         if (data && typeof data === 'object') {
           Object.keys(_s).forEach(k => { if (data[k] !== undefined) _s[k] = data[k]; });
         }
@@ -490,8 +502,10 @@
       _s.photos = photos;
       return fetch('/api/settings', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders(),
         body: JSON.stringify(_s)
+      }).then(r => {
+        if (r.status === 401) adminLogout('Session expired. Log in again.');
       }).catch(() => {});
     }
 
@@ -585,24 +599,53 @@
     }
 
     // ===== AUTH =====
-    function adminAuth() {
+    async function adminAuth() {
       const pass = document.getElementById('adminPass').value;
-      if (pass === ADMIN_PASS) {
+      const errEl = document.getElementById('loginError');
+      if (!pass) return;
+      errEl.style.display = 'none';
+      try {
+        const r = await fetch('/api/settings', { headers: { 'Authorization': 'Bearer ' + pass } });
+        if (r.status === 401) {
+          errEl.textContent = 'Incorrect password. Try again.';
+          errEl.style.display = 'block';
+          document.getElementById('adminPass').value = '';
+          document.getElementById('adminPass').focus();
+          return;
+        }
+        if (!r.ok) {
+          errEl.textContent = 'Server error. Please try again.';
+          errEl.style.display = 'block';
+          return;
+        }
+        adminToken = pass;
+        sessionStorage.setItem('drippy_admin_token', pass);
+        document.getElementById('adminPass').value = '';
         document.getElementById('adminLogin').classList.add('hidden');
         document.getElementById('adminDashboard').classList.add('active');
-        loadServerSettings().then(() => {
-          mergeCustomProducts();
-          document.getElementById('adminEmail').value = adminEmail;
-          updateStats();
-          renderGallery();
-          renderSubscribers();
-          renderPriceList();
-          renderCustomOrders();
-        });
-      } else {
-        document.getElementById('loginError').style.display = 'block';
-        document.getElementById('adminPass').value = '';
-        document.getElementById('adminPass').focus();
+        await loadServerSettings();
+        mergeCustomProducts();
+        document.getElementById('adminEmail').value = adminEmail;
+        updateStats();
+        renderGallery();
+        renderSubscribers();
+        renderPriceList();
+        renderCustomOrders();
+      } catch {
+        errEl.textContent = 'Network error. Please try again.';
+        errEl.style.display = 'block';
+      }
+    }
+
+    function adminLogout(message) {
+      adminToken = '';
+      sessionStorage.removeItem('drippy_admin_token');
+      document.getElementById('adminDashboard').classList.remove('active');
+      document.getElementById('adminLogin').classList.remove('hidden');
+      if (message) {
+        const errEl = document.getElementById('loginError');
+        errEl.textContent = message;
+        errEl.style.display = 'block';
       }
     }
 

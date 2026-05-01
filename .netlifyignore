@@ -3,3 +3,4 @@ deploy
 .git
 .vercel
 *.log
+api

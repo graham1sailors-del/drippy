@@ -387,6 +387,13 @@
       <button class="btn btn-primary" style="margin-top:1rem;" onclick="savePrices()"><i class="fas fa-save"></i> Save Changes</button>
     </div>
 
+    <!-- All Orders -->
+    <div class="upload-section" style="margin-bottom:2rem;">
+      <h2><i class="fas fa-shopping-bag" style="color:#7c3aed; margin-right:8px;"></i>Orders <span id="orderCount" style="color:#555; font-size:0.9rem; font-weight:400;"></span></h2>
+      <p>All customer orders — name, email, shipping address, items, totals.</p>
+      <div id="orderList" style="margin-top:1rem;"></div>
+    </div>
+
     <!-- Custom Orders -->
     <div class="upload-section" style="margin-bottom:2rem;">
       <h2><i class="fas fa-paint-brush" style="color:#7c3aed; margin-right:8px;"></i>Custom Orders <span id="customOrderCount" style="color:#555; font-size:0.9rem; font-weight:400;"></span></h2>
@@ -630,6 +637,7 @@
         renderGallery();
         renderSubscribers();
         renderPriceList();
+        renderOrders();
         renderCustomOrders();
       } catch {
         errEl.textContent = 'Network error. Please try again.';
@@ -894,6 +902,56 @@
       document.getElementById('statTshirts').textContent = photos.filter(p => p.category === 'tshirts').length;
       document.getElementById('statSweatshirts').textContent = photos.filter(p => p.category === 'sweatshirts').length;
       document.getElementById('statSubs').textContent = subs.length;
+    }
+
+    // ===== ORDERS =====
+    function renderOrders() {
+      const orders = (_s.orders || []).slice().reverse();
+      const list = document.getElementById('orderList');
+      document.getElementById('orderCount').textContent = '(' + orders.length + ')';
+
+      if (orders.length === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:2rem;color:#444;"><i class="fas fa-shopping-bag" style="font-size:2rem;margin-bottom:1rem;display:block;"></i>No orders yet</div>';
+        return;
+      }
+
+      list.innerHTML = '<div style="display:flex;flex-direction:column;gap:0.75rem;">' + orders.map(o => {
+        const addr = o.address || {};
+        const addrLine = [addr.street, addr.city, addr.state, addr.zip].filter(Boolean).join(', ');
+        const items = (o.items || []).map(i => `<div style="font-size:0.85rem;"><strong>${i.qty}×</strong> ${escapeHtml(i.name || '')} ${i.size ? '· ' + i.size : ''} ${i.color ? '· ' + i.color : ''} <span style="color:#888;float:right;">$${(i.price * i.qty).toFixed(2)}</span></div>`).join('');
+        const date = o.date ? new Date(o.date).toLocaleString() : '';
+        const status = o.status || 'Pending';
+        const statusColor = status === 'Pending' ? '#f59e0b' : status === 'Shipped' ? '#22c55e' : '#7c3aed';
+        return `
+          <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:1rem 1.25rem;border:1px solid rgba(255,255,255,0.04);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;flex-wrap:wrap;gap:0.5rem;">
+              <div>
+                <div style="font-weight:700;font-size:0.95rem;">${escapeHtml(o.id || '')}</div>
+                <div style="font-size:0.8rem;color:#888;">${escapeHtml(o.customer || '')} · ${escapeHtml(o.email || '')}</div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-weight:800;color:#7c3aed;font-size:1.1rem;">$${Number(o.total || 0).toFixed(2)}</div>
+                <div style="font-size:0.75rem;color:#666;">${date}</div>
+              </div>
+            </div>
+            <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.75rem;font-size:0.85rem;">
+              <strong style="color:#a855f7;">Ship to:</strong> ${escapeHtml(addr.name || o.customer || '')}<br>
+              ${escapeHtml(addrLine)}
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:0.5rem 0.85rem;">
+              ${items}
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.75rem;font-size:0.8rem;color:#666;">
+              <span>Subtotal: $${Number(o.subtotal || 0).toFixed(2)} · Tax: $${Number(o.tax || 0).toFixed(2)}</span>
+              <span style="background:${statusColor}22;color:${statusColor};padding:3px 10px;border-radius:6px;font-weight:700;font-size:0.7rem;">${status.toUpperCase()}</span>
+            </div>
+          </div>
+        `;
+      }).join('') + '</div>';
+    }
+
+    function escapeHtml(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
     }
 
     // ===== CUSTOM ORDERS =====
